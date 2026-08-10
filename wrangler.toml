@@ -13,7 +13,9 @@ id = "79d7c1fbc0424415853d07e6de716ba6"
 name = "ROOM"
 class_name = "GameRoom"
 
-# Bắt buộc khi thêm Durable Object lần đầu vào một worker đã tồn tại
+# Bắt buộc khi thêm Durable Object lần đầu vào một worker đã tồn tại.
+# LƯU Ý: Cloudflare hiện yêu cầu gói Free dùng "new_sqlite_classes" (không phải "new_classes" cũ) —
+# nếu dùng "new_classes" sẽ gặp lỗi code 10097 khi deploy.
 [[migrations]]
 tag = "v1"
-new_classes = ["GameRoom"]
+new_sqlite_classes = ["GameRoom"]
