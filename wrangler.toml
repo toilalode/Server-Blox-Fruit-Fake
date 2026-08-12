@@ -1,0 +1,45 @@
+name = "blox-fruit-fake"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# KV namespace đã có sẵn — thay "id" bằng ID thật của namespace GAME_DATA của bạn
+# (xem trong Cloudflare Dashboard > Workers & Pages > KV, hoặc chạy `wrangler kv namespace list`)
+[[kv_namespaces]]
+binding = "GAME_DATA"
+id = "79d7c1fbc0424415853d07e6de716ba6"
+
+# Durable Object cho multiplayer realtime + chat theo phòng
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "GameRoom"
+
+# Durable Object MỚI: instance DUY NHẤT toàn server, quản lý sự kiện x50/hidden + trade (gift & offer 2 chiều)
+[[durable_objects.bindings]]
+name = "GLOBAL"
+class_name = "GlobalState"
+
+# Durable Object MỚI: instance DUY NHẤT toàn server, quản lý Guild (tạo/mời/kick/rời, bảng xếp hạng)
+# và PvP có thưởng (báo cáo thắng/thua, cộng Gold + guild XP thẳng vào save data trong KV).
+[[durable_objects.bindings]]
+name = "GUILD"
+class_name = "GuildState"
+
+# Bắt buộc khi thêm Durable Object mới vào worker — mỗi lần thêm class mới phải thêm 1 migration mới,
+# KHÔNG sửa lại migration cũ (v1/v2) đã áp dụng, chỉ thêm migration mới cho class mới.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["GlobalState"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["GuildState"]
+
+# QUAN TRỌNG: secret cho Admin Panel (ADMIN_KEY) KHÔNG khai báo ở đây (file này có thể bị lộ/commit).
+# Set riêng bằng lệnh (chạy 1 lần trong Codespaces/Terminal, sẽ hỏi bạn nhập giá trị bí mật):
+#   wrangler secret put ADMIN_KEY
+# Đặt 1 chuỗi dài, ngẫu nhiên, không trùng với bất kỳ mật khẩu nào khác — đây là "chìa khoá" duy nhất
+# để admin panel xác thực thật với server, thay vì chỉ dựa vào tên phiên "toilalode" như trước (dễ giả mạo).
